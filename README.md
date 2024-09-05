@@ -36,7 +36,7 @@
 
 先下载`download/build.config`
 
-接着还原`Game`文件夹，**后面会提交一个客户端样例**
+接着还原`Game`文件夹，**[客户端样例](https://github.com/BUGres/ServerGameLauncher)**
 
 以一个配置单为例
 
@@ -49,9 +49,9 @@ Game\main.pak 88343377 b408488527227b5e0c017fe9b8378eae 24
 
 分别是以空格分开的`[文件路径] [文件长度] [文件内容MD5] [文件分卷个数]`
 
-以第一个文件为例 `Game\fonts\fzcq.ttf`
+以第一个文件为例（Game\fonts\fzcq.ttf）
 
-客户端应该下载的 `uri` 分别是
+客户端应该下载的uri分别是
 
 ```
 download/c232cf5a5f9bad7f14b78c0d894cedf1.7z.001
@@ -59,6 +59,3 @@ download/c232cf5a5f9bad7f14b78c0d894cedf1.7z.002
 download/c232cf5a5f9bad7f14b78c0d894cedf1.7z.003
 ```
 
-这里的 `c232cf5a5f9bad7f14b78c0d894cedf1` 是文件路径 `Game\fonts\fzcq.ttf` 的MD5
-
-**生成文件时会保有一个中间文件夹，名字为一串MD5，必须删除 `download` 和这个中间文件夹才能重新打包，不然会报错**
