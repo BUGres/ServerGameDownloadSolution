@@ -31,11 +31,8 @@ extern "C"
     __declspec(dllexport) bool __stdcall CPP_CheckFile(std::string, std::string);
     // 真正C风格函数
     __declspec(dllexport) bool __cdecl C_CheckFile(char*, char*);
-}
-
-bool C_CheckFile(char* path, char* md5)
-{
-    return CPP_CheckFile(string(path), string(md5));
+    __declspec(dllexport) int* __cdecl C_WriteAsHash(char*);
+    __declspec(dllexport) void __cdecl C_WriteInfo(int*);
 }
 
 string CPP_GetMD5(string str)
@@ -340,4 +337,24 @@ bool CPP_CheckFile(string path, string md5)
     }
     delete buffer;
     return true;
+}
+
+bool C_CheckFile(char* path, char* md5)
+{
+    return CPP_CheckFile(string(path), string(md5));
+}
+
+int* C_WriteAsHash(char* folder) // 文件夹下所有文件重命名为Hash，并兼顾了生成
+{
+    string str = string(folder);
+    FileTree* ft = new FileTree(&str);
+    std::filesystem::create_directories("download");
+    ft->WriteAsHash(ft->root);
+    return (int*)ft;
+}
+
+void C_WriteInfo(int* intptr)
+{
+    FileTree* ft = (FileTree*)intptr;
+    ft->WriteInfoAsFile();
 }
