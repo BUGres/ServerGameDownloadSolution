@@ -2,7 +2,7 @@
 #include "pch.h"
 
 using namespace std;
-namespace fs = std::filesystem;
+namespace fs = std::filesystem; // 如果这里报错，是因为C++版本，切换到ISO C++ 17即可
 
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
