@@ -1,6 +1,16 @@
 ﻿// dllmain.cpp : 定义 DLL 应用程序的入口点。
 #include "pch.h"
 
+//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 填下面的色号);
+//0 = 黑色 8 = 灰色　　
+//1 = 蓝色 9 = 淡蓝色 十六进制
+//2 = 绿色 10 = 淡绿色 0xa
+//3 = 湖蓝色 11 = 淡浅绿色 0xb 　　
+//4 = 红色 12 = 淡红色 0xc
+//5 = 紫色 13 = 淡紫色 0xd
+//6 = 黄色 14 = 淡黄色 0xe
+//7 = 白色 15 = 亮白色 0xf
+
 using namespace std;
 namespace fs = std::filesystem; // 如果这里报错，是因为C++版本，切换到ISO C++ 17即可
 
@@ -192,9 +202,10 @@ public:
     {
         if (n->isFile)
         {
-            // system("pause");
             n->data = File2Stream(n->name);
-            cout << "[FileBuild.dll][FileTree::WriteAsHash] Read File " + n->name + " with " + to_string(n->data->size()) + " bytes" << endl;
+            cout << "[FileBuild.dll][FileTree::WriteAsHash] dealwith " << n->name << endl;
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 6);
+            cout << "[FileBuild.dll][FileTree::WriteAsHash 1/3] Read File " + n->name + " with " + to_string(n->data->size()) + " bytes" << endl;
             string path = n->name;
             vector<string> paths = vector<string>();
             string tmp = "";
@@ -227,9 +238,19 @@ public:
                 filepath.append(CPP_GetMD5(paths[i]) + "/");
             }
             filepath[filepath.length() - 1] = '.';
-            std::filesystem::create_directories(folderpath); // 真正建立文件夹路径
-            Stream2File(filepath, n-> data); // 真正建立文件
+            try
+            {
 
+                std::filesystem::create_directories(folderpath); // 真正建立文件夹路径
+            }
+            catch (const fs::filesystem_error& e)
+            {
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 12);
+                std::cerr << "FileSystemError: " << e.what() << std::endl;
+                while (true);
+            }
+            Stream2File(filepath, n-> data); // 真正建立文件
+            cout << "[FileBuild.dll][FileTree::WriteAsHash 2/3] " << filepath << " copy as hash name." << endl;
             // 生成客户端数字签名
             if (n->data->size() == 0)
             {
@@ -250,8 +271,11 @@ public:
             string pack300m = pack30m + pack30m + pack30m + pack30m + pack30m + pack30m + pack30m + pack30m + pack30m + pack30m;
             string pack3g = pack300m + pack300m + pack300m + pack300m + pack300m + pack300m + pack300m + pack300m + pack300m + pack300m;
             string cmd7z = string("7z.exe a download/") + CPP_GetMD5(path) + string(" ") + filepath.substr(0, filepath.length() - 1) + pack3g;
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 8);
             int result = system(cmd7z.c_str());
-            // std::filesystem::remove(filepath.substr(0, filepath.length() - 1));
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 6);
+            cout << "[FileBuild.dll][FileTree::WriteAsHash 3/3] 7z finish." << endl;
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
 
             // 检查打包结果
             int packcount = 1;
@@ -285,11 +309,21 @@ void CPP_BuildFile(string str)
     cout << "[FileBuild.dll::BuildFile] ReadFolder:" + str << endl;
     string* newName = new string(str);
     FileTree* ft = new FileTree(newName);
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 8);
     ft->CmdShowNode(ft->root);
+    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 15);
     system("pause");
     system("CLS");
     cout << "[FileBuild.dll::BuildFile] All file names overwrite as MD5" << endl;
     cout << "[FileBuild.dll::BuildFile] Aboout to read all file and rebuild as MD5 names" << endl;
+    if (std::filesystem::is_directory("download"))
+    {
+        std::filesystem::remove_all("download");
+    }
+    if (std::filesystem::is_directory("63d72051e901c069f8aa1b32aa0c43bb"))
+    {
+        std::filesystem::remove_all("63d72051e901c069f8aa1b32aa0c43bb");
+    }
     std::filesystem::create_directories("download"); // 建立下载文件夹
     ft->WriteAsHash(ft->root);
     cout << "Pack Finish! ";
